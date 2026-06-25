@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pétale — Fine Dining</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:#e8a4b4;--rose-deep:#c97d93;--blush:#f9eef2;--petal:#fdf4f7;
+  --sage:#8aad9a;--cream:#faf7f4;--warm-white:#fff9f7;
+  --gold:#c9a96e;--gold-light:#f0e0c0;
+  --bg:#fdf6f9;--bg2:#fff9fb;--card:#ffffff;--border:#f0dde5;
+  --text:#2a1f25;--text-mid:#6b4f5a;--text-muted:#a08090;
+  --shadow:0 4px 24px rgba(180,100,130,0.10);
+  --shadow-lg:0 8px 40px rgba(180,100,130,0.15);
+  --nav-h:72px;--radius:20px;--radius-sm:12px;
+}
+[data-theme="dark"] {
+  --bg:#1a1018;--bg2:#231520;--card:#2d1e27;--border:#4a2d3a;
+  --text:#fceef4;--text-mid:#d4a8bb;--text-muted:#9a7080;
+  --rose:#d47d97;--rose-deep:#b85c77;--blush:#2d1e27;--petal:#231520;
+  --cream:#1a1018;--warm-white:#2d1e27;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);--shadow-lg:0 8px 40px rgba(0,0,0,0.5);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;overflow-x:hidden;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--rose);border-radius:99px;}
+
+/* NAV */
+#site-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:rgba(253,246,249,0.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 40px;gap:20px;z-index:900;transition:background .3s,border .3s;}
+[data-theme="dark"] #site-nav{background:rgba(26,16,24,0.92);}
+.nav-logo{font-family:'Playfair Display',serif;font-size:1.55rem;font-style:italic;color:var(--rose-deep);text-decoration:none;letter-spacing:.02em;flex-shrink:0;}
+.nav-logo span{color:var(--gold);}
+.nav-links{display:flex;gap:24px;list-style:none;margin-left:auto;}
+.nav-links a{text-decoration:none;font-size:.82rem;font-weight:500;color:var(--text-mid);letter-spacing:.05em;text-transform:uppercase;transition:color .2s;position:relative;}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;right:100%;height:1px;background:var(--rose);transition:right .25s;}
+.nav-links a:hover::after{right:0;}
+.nav-links a:hover{color:var(--rose-deep);}
+.nav-actions{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+#theme-toggle{background:var(--blush);border:1px solid var(--border);color:var(--text-mid);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.05rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+#theme-toggle:hover{background:var(--rose);color:#fff;}
+#nav-table-btn{background:var(--blush);border:1.5px solid var(--border);color:var(--text-mid);padding:8px 16px;border-radius:99px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:7px;transition:all .2s;}
+#nav-table-btn:hover{border-color:var(--rose);color:var(--rose-deep);}
+#nav-table-btn.has-table{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);}
+#nav-cart-btn{background:var(--rose-deep);color:#fff;border:none;padding:9px 18px;border-radius:99px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.85rem;display:flex;align-items:center;gap:8px;transition:all .2s;}
+#nav-cart-btn:hover{background:var(--rose);transform:translateY(-1px);box-shadow:var(--shadow);}
+#nav-cart-count{background:var(--gold);color:var(--text);border-radius:50%;width:20px;height:20px;font-size:.7rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;}
+#view-bill-btn{background:var(--blush);color:var(--text-mid);border:1px solid var(--border);padding:8px 14px;border-radius:99px;cursor:pointer;font-size:.82rem;font-family:'DM Sans',sans-serif;font-weight:500;transition:all .2s;display:none;}
+#view-bill-btn:hover{border-color:var(--rose);color:var(--rose-deep);}
+
+/* TABLE SELECT MODAL */
+#table-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+#table-modal-overlay.open{display:flex;}
+#table-modal{background:var(--card);border-radius:28px;padding:44px 40px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(180,100,130,.25);border:1px solid var(--border);text-align:center;position:relative;}
+.tss-petal{font-size:3rem;margin-bottom:8px;display:inline-block;animation:floatPetal 3s ease-in-out infinite;}
+@keyframes floatPetal{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-10px) rotate(5deg);}}
+#table-modal h2{font-family:'Playfair Display',serif;font-size:2rem;color:var(--text);margin-bottom:8px;}
+#table-modal>p{color:var(--text-muted);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.08rem;margin-bottom:32px;}
+.table-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;max-width:380px;margin:0 auto 28px;}
+.table-btn{background:var(--card);border:1.5px solid var(--border);color:var(--text-mid);padding:16px 8px;border-radius:var(--radius-sm);cursor:pointer;font-size:1.05rem;font-weight:700;font-family:'Playfair Display',serif;transition:all .22s;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+.table-btn::before{content:'🌸';font-size:.9rem;opacity:.7;}
+.table-btn:hover:not(.occupied){border-color:var(--rose);background:var(--blush);color:var(--rose-deep);transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.table-btn.occupied{opacity:.35;cursor:not-allowed;background:var(--bg2);}
+.table-btn.occupied::before{content:'🚫';}
+.table-btn.current{border-color:var(--rose-deep);background:linear-gradient(135deg,var(--blush),var(--petal));color:var(--rose-deep);}
+.table-btn.current::before{content:'🌹';}
+#modal-close-btn{position:absolute;top:18px;right:18px;background:var(--blush);border:1px solid var(--border);color:var(--text-muted);width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+#modal-close-btn:hover{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);}
+
+/* MAIN */
+#main-site{padding-top:var(--nav-h);}
+
+/* HERO */
+#section-hero{min-height:92vh;display:flex;align-items:center;padding:80px 60px 60px;position:relative;overflow:hidden;background:var(--bg);}
+.hero-bg-decor{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.hero-bg-decor::before{content:'';position:absolute;top:-20%;right:-10%;width:65vw;height:65vw;background:radial-gradient(circle,rgba(232,164,180,.22) 0%,transparent 60%);border-radius:50%;}
+.hero-bg-decor::after{content:'';position:absolute;bottom:-10%;left:-5%;width:40vw;height:40vw;background:radial-gradient(circle,rgba(138,173,154,.12) 0%,transparent 60%);border-radius:50%;}
+.hero-content{flex:1;max-width:560px;position:relative;z-index:1;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--blush);border:1px solid var(--border);color:var(--rose-deep);font-size:.76rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:6px 16px;border-radius:99px;margin-bottom:28px;}
+.hero-eyebrow::before{content:'🌸';font-size:.82rem;}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,5vw,4.2rem);line-height:1.12;color:var(--text);margin-bottom:22px;}
+.hero-title em{font-style:italic;color:var(--rose-deep);display:block;}
+.hero-subtitle{font-family:'Cormorant Garamond',serif;font-size:1.18rem;color:var(--text-muted);line-height:1.65;margin-bottom:40px;max-width:440px;}
+.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;}
+.btn-primary{background:var(--rose-deep);color:#fff;border:none;padding:14px 30px;border-radius:99px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.02em;transition:all .22s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-primary:hover{background:var(--rose);transform:translateY(-2px);box-shadow:0 8px 24px rgba(180,100,130,.3);}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text-mid);padding:13px 26px;border-radius:99px;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;font-size:.9rem;transition:all .22s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+.btn-outline:hover{border-color:var(--rose);color:var(--rose-deep);background:var(--blush);}
+.hero-visual{flex:0 0 auto;width:420px;position:relative;z-index:1;}
+.hero-img-wrap{width:380px;height:460px;background:var(--blush);border-radius:200px 200px 160px 160px;display:flex;align-items:center;justify-content:center;font-size:7rem;position:relative;border:2px solid var(--border);box-shadow:var(--shadow-lg);overflow:hidden;}
+.hero-float-tag{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 15px;box-shadow:var(--shadow);font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:7px;white-space:nowrap;animation:floatTag 4s ease-in-out infinite;}
+@keyframes floatTag{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.hero-float-tag.tag1{top:40px;right:-20px;color:var(--rose-deep);}
+.hero-float-tag.tag2{bottom:60px;left:-30px;color:var(--sage);animation-delay:2s;}
+.hero-stats{display:flex;gap:36px;margin-top:48px;}
+.hero-stat-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--rose-deep);line-height:1;}
+.hero-stat-label{font-size:.76rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
+
+/* SECTIONS */
+.site-section{padding:100px 60px;}
+.section-label{display:inline-flex;align-items:center;gap:8px;font-size:.74rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-deep);margin-bottom:14px;}
+.section-label::before,.section-label::after{content:'—';color:var(--rose);opacity:.5;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,3.5vw,2.7rem);line-height:1.2;color:var(--text);margin-bottom:14px;}
+.section-subtitle{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--text-muted);line-height:1.65;max-width:480px;}
+.section-header{margin-bottom:52px;}
+.section-header.centered{text-align:center;}
+.section-header.centered .section-subtitle{margin:0 auto;}
+
+/* STORY */
+#section-story{background:var(--bg2);display:flex;align-items:center;gap:72px;}
+.story-visual{flex:0 0 400px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:210px 210px;gap:12px;}
+.story-img-block{border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:3.5rem;border:1px solid var(--border);transition:transform .3s;}
+.story-img-block:hover{transform:scale(1.02);}
+.story-img-block.tall{grid-row:span 2;font-size:5rem;}
+.story-img-block:nth-child(1){background:linear-gradient(135deg,var(--blush),var(--gold-light));}
+.story-img-block:nth-child(2){background:linear-gradient(135deg,#e8f4ee,#d0eadb);}
+.story-img-block:nth-child(3){background:linear-gradient(135deg,var(--petal),var(--blush));}
+.story-content{flex:1;}
+.story-quote{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;color:var(--text-mid);border-left:3px solid var(--rose);padding-left:20px;margin:26px 0;line-height:1.65;}
+.story-body{color:var(--text-muted);font-size:.9rem;line-height:1.75;margin-bottom:28px;}
+.story-features{display:flex;flex-direction:column;gap:14px;}
+.story-feature{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--border);padding:13px 16px;border-radius:var(--radius-sm);transition:all .2s;}
+.story-feature:hover{border-color:var(--rose);box-shadow:var(--shadow);}
+.story-feature-icon{font-size:1.35rem;flex-shrink:0;}
+.story-feature-text h4{font-size:.9rem;font-weight:600;color:var(--text);}
+.story-feature-text p{font-size:.78rem;color:var(--text-muted);}
+
+/* MENU */
+#section-menu{background:var(--bg);}
+.menu-tabs-wrap{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin-bottom:36px;}
+.menu-tabs-wrap::-webkit-scrollbar{display:none;}
+.cat-tab{background:var(--card);border:1.5px solid var(--border);color:var(--text-muted);padding:8px 20px;border-radius:99px;cursor:pointer;white-space:nowrap;font-size:.83rem;font-weight:500;font-family:'DM Sans',sans-serif;transition:all .2s;flex-shrink:0;}
+.cat-tab:hover{border-color:var(--rose);color:var(--rose-deep);}
+.cat-tab.active{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);font-weight:600;}
+#menu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:22px;}
+.menu-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:transform .22s,box-shadow .22s;}
+.menu-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);}
+.menu-card-img{width:100%;height:170px;background:linear-gradient(135deg,var(--blush),var(--petal));display:flex;align-items:center;justify-content:center;font-size:4rem;position:relative;overflow:hidden;}
+.menu-card-img img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.menu-card-img::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(to top,var(--card),transparent);}
+.menu-card-body{padding:16px 18px 18px;}
+.menu-card-body h3{font-family:'Playfair Display',serif;font-size:1.02rem;font-weight:600;color:var(--text);margin-bottom:5px;}
+.menu-card-body>p{font-size:.8rem;color:var(--text-muted);line-height:1.5;margin-bottom:12px;}
+.menu-card-footer{display:flex;align-items:center;justify-content:space-between;}
+.price{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--rose-deep);}
+.offer-tag{background:#e8f4ee;color:#3a7a54;font-size:.68rem;padding:2px 9px;border-radius:99px;font-weight:600;margin-left:5px;}
+.spicy-tag{font-size:.68rem;padding:2px 8px;border-radius:99px;font-weight:500;margin-top:4px;display:inline-block;}
+.spicy-High{background:#fde8e8;color:#c0392b;}
+.spicy-Medium{background:#fef3e2;color:#b7730a;}
+.spicy-None{background:#e8f4ee;color:#3a7a54;}
+.add-btn{background:var(--rose-deep);color:#fff;border:none;padding:8px 16px;border-radius:99px;cursor:pointer;font-size:.83rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s;}
+.add-btn:hover{background:var(--rose);box-shadow:0 4px 12px rgba(180,100,130,.3);}
+.qty-control{display:flex;align-items:center;gap:8px;}
+.qty-control button{background:var(--blush);color:var(--rose-deep);border:1px solid var(--border);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;font-weight:700;transition:all .2s;}
+.qty-control button:hover{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);}
+.qty-control span{font-weight:700;min-width:20px;text-align:center;color:var(--text);}
+#loading{display:flex;align-items:center;justify-content:center;height:50vh;flex-direction:column;gap:14px;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--rose-deep);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TABLE SECTION */
+#section-table{background:var(--bg2);text-align:center;}
+.table-grid-section{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;max-width:480px;margin:0 auto 32px;}
+.table-btn-section{background:var(--card);border:1.5px solid var(--border);color:var(--text-mid);padding:18px 8px;border-radius:var(--radius-sm);cursor:pointer;font-size:1.05rem;font-weight:700;font-family:'Playfair Display',serif;transition:all .22s;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;}
+.table-btn-section::before{content:'🌸';font-size:.85rem;opacity:.6;}
+.table-btn-section:hover:not(.occupied){border-color:var(--rose-deep);background:var(--blush);color:var(--rose-deep);transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.table-btn-section.occupied{opacity:.35;cursor:not-allowed;}
+.table-btn-section.occupied::before{content:'✦';}
+.table-btn-section.current{border-color:var(--rose-deep);background:linear-gradient(135deg,var(--blush),var(--petal));color:var(--rose-deep);}
+.table-btn-section.current::before{content:'🌹';}
+
+/* EXPERIENCE */
+#section-experience{background:var(--bg);}
+.experience-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:22px;}
+.exp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:30px 26px;transition:all .22s;position:relative;overflow:hidden;}
+.exp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rose),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .3s;}
+.exp-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:transparent;}
+.exp-card:hover::before{transform:scaleX(1);}
+.exp-icon{font-size:2.3rem;margin-bottom:16px;display:block;}
+.exp-card h3{font-family:'Playfair Display',serif;font-size:1.05rem;margin-bottom:9px;color:var(--text);}
+.exp-card p{font-size:.83rem;color:var(--text-muted);line-height:1.6;}
+
+/* CHEFS */
+#section-chefs{background:var(--bg2);}
+.chefs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px;}
+.chef-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px 18px;text-align:center;transition:all .22s;}
+.chef-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);}
+.chef-avatar{width:78px;height:78px;background:linear-gradient(135deg,var(--blush),var(--gold-light));border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:2.4rem;border:2px solid var(--border);}
+.chef-card h3{font-family:'Playfair Display',serif;font-size:.98rem;font-weight:600;margin-bottom:4px;}
+.chef-card p{font-size:.78rem;color:var(--text-muted);margin-bottom:10px;}
+.chef-specialty{font-size:.73rem;background:var(--blush);color:var(--rose-deep);padding:4px 12px;border-radius:99px;display:inline-block;font-weight:500;}
+
+/* TESTIMONIALS */
+#section-testimonials{background:var(--bg);}
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:22px;}
+.testimonial-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px 22px;position:relative;transition:all .22s;}
+.testimonial-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);}
+.testimonial-card::before{content:'"';font-family:'Playfair Display',serif;font-size:6rem;color:var(--rose);opacity:.15;position:absolute;top:-10px;left:18px;line-height:1;}
+.testimonial-stars{color:var(--gold);font-size:.88rem;margin-bottom:12px;letter-spacing:2px;}
+.testimonial-text{font-family:'Cormorant Garamond',serif;font-size:1.02rem;line-height:1.65;color:var(--text-mid);margin-bottom:18px;font-style:italic;}
+.testimonial-author{display:flex;align-items:center;gap:11px;}
+.author-avatar{width:38px;height:38px;border-radius:50%;background:var(--blush);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.15rem;}
+.author-name{font-weight:600;font-size:.86rem;color:var(--text);}
+.author-role{font-size:.74rem;color:var(--text-muted);}
+
+/* RESERVATION */
+#section-reservation{background:linear-gradient(135deg,var(--blush) 0%,var(--petal) 50%,var(--bg2) 100%);text-align:center;position:relative;overflow:hidden;}
+[data-theme="dark"] #section-reservation{background:linear-gradient(135deg,var(--bg2) 0%,var(--card) 100%);}
+#section-reservation::before{content:'🌸';position:absolute;top:40px;right:80px;font-size:4rem;opacity:.1;}
+#section-reservation::after{content:'🌹';position:absolute;bottom:40px;left:80px;font-size:3.5rem;opacity:.08;}
+.reservation-box{max-width:520px;margin:0 auto;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:44px 44px;box-shadow:var(--shadow-lg);position:relative;z-index:1;}
+.res-info{display:flex;flex-direction:column;gap:12px;margin-top:28px;}
+.res-info-item{display:flex;align-items:center;gap:13px;padding:13px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);}
+.res-info-icon{font-size:1.25rem;flex-shrink:0;}
+.res-info-text h4{font-size:.86rem;font-weight:600;color:var(--text);}
+.res-info-text p{font-size:.78rem;color:var(--text-muted);}
+.res-cta{margin-top:26px;width:100%;padding:15px;font-size:.92rem;border-radius:var(--radius-sm);}
+
+/* FOOTER */
+#site-footer{background:var(--text);color:rgba(255,255,255,.65);padding:60px 60px 36px;}
+[data-theme="dark"] #site-footer{background:#110c10;}
+.footer-inner{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:44px;margin-bottom:44px;}
+.footer-brand p{font-size:.83rem;line-height:1.65;margin-top:14px;max-width:280px;color:rgba(255,255,255,.45);}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.7rem;font-style:italic;color:#fff;letter-spacing:.02em;}
+.footer-logo span{color:var(--rose);}
+.footer-col h4{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.9);margin-bottom:16px;}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.footer-col a{text-decoration:none;font-size:.83rem;color:rgba(255,255,255,.45);transition:color .2s;}
+.footer-col a:hover{color:var(--rose);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:26px;display:flex;align-items:center;justify-content:space-between;}
+.footer-bottom p{font-size:.8rem;}
+.footer-nav{display:flex;gap:22px;}
+.footer-nav a{text-decoration:none;color:rgba(255,255,255,.38);font-size:.8rem;transition:color .2s;}
+.footer-nav a:hover{color:var(--rose);}
+
+/* CART */
+#cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:none;backdrop-filter:blur(4px);}
+#cart-overlay.open{display:block;}
+#cart-sidebar{position:fixed;right:0;top:0;bottom:0;width:370px;background:var(--card);z-index:1001;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;border-left:1px solid var(--border);box-shadow:-8px 0 40px rgba(0,0,0,.15);}
+#cart-sidebar.open{transform:translateX(0);}
+#cart-header{padding:20px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+#cart-header h2{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--text);}
+#close-cart{background:var(--blush);border:1px solid var(--border);color:var(--text-mid);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:.95rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+#close-cart:hover{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);}
+#cart-items{flex:1;overflow-y:auto;padding:14px 18px;}
+.cart-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);}
+.cart-item-emoji{font-size:1.9rem;flex-shrink:0;}
+.cart-item-info{flex:1;}
+.cart-item-info h4{font-size:.88rem;font-weight:600;color:var(--text);}
+.cart-item-info p{font-size:.78rem;color:var(--text-muted);}
+#cart-footer{padding:18px 22px;border-top:1px solid var(--border);}
+#cart-total{font-size:1.05rem;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;color:var(--text);}
+#cart-total span:last-child{color:var(--rose-deep);font-family:'Playfair Display',serif;}
+#place-order-btn{width:100%;background:linear-gradient(135deg,var(--rose-deep),var(--rose));color:#fff;border:none;padding:14px;border-radius:var(--radius-sm);font-size:.92rem;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .22s;}
+#place-order-btn:hover{opacity:.9;transform:translateY(-1px);box-shadow:0 8px 20px rgba(180,100,130,.35);}
+#empty-cart{text-align:center;color:var(--text-muted);padding:50px 0;}
+#empty-cart p{margin-top:12px;font-family:'Cormorant Garamond',serif;font-size:1.08rem;font-style:italic;}
+
+/* SUCCESS */
+#order-success{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+#order-success.show{display:flex;}
+.success-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:46px;text-align:center;max-width:370px;width:90%;box-shadow:var(--shadow-lg);}
+.success-box .icon{font-size:4rem;margin-bottom:14px;animation:successPop .5s ease;}
+@keyframes successPop{0%{transform:scale(0);}70%{transform:scale(1.2);}100%{transform:scale(1);}}
+.success-box h2{font-family:'Playfair Display',serif;font-size:1.55rem;margin-bottom:8px;color:var(--text);}
+.success-box p{color:var(--text-muted);margin-bottom:26px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.02rem;}
+.success-box button{background:var(--rose-deep);color:#fff;border:none;padding:12px 30px;border-radius:99px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s;}
+.success-box button:hover{background:var(--rose);}
+
+/* BILL */
+#bill-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+#bill-modal.show{display:flex;}
+.bill-box{background:#fff;color:#2a1f25;border-radius:var(--radius);padding:34px;max-width:390px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+[data-theme="dark"] .bill-box{background:var(--card);color:var(--text);}
+.bill-box h2{font-family:'Playfair Display',serif;text-align:center;font-size:1.35rem;border-bottom:2px dashed #f0dde5;padding-bottom:13px;margin-bottom:18px;color:var(--rose-deep);}
+.bill-row{display:flex;justify-content:space-between;margin-bottom:9px;font-size:.86rem;}
+.bill-total{border-top:2px dashed #f0dde5;padding-top:13px;font-weight:700;font-size:.98rem;margin-top:4px;}
+.pay-btns{display:flex;gap:10px;margin-top:18px;}
+.pay-btn{flex:1;padding:12px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-weight:600;font-size:.88rem;transition:all .2s;}
+.pay-cash{background:#27ae60;color:#fff;}
+.pay-cash:hover{background:#219a52;}
+.pay-card{background:#2980b9;color:#fff;}
+.pay-card:hover{background:#2471a3;}
+.bill-close{display:block;width:100%;margin-top:9px;padding:11px;background:var(--blush);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;font-size:.86rem;color:var(--text-mid);transition:all .2s;}
+.bill-close:hover{background:var(--border);}
+
+/* BACK TO TOP */
+#back-to-top{position:fixed;bottom:26px;right:26px;width:46px;height:46px;background:var(--rose-deep);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(180,100,130,.4);opacity:0;transform:translateY(16px);transition:all .3s;z-index:800;pointer-events:none;}
+#back-to-top.visible{opacity:1;transform:translateY(0);pointer-events:auto;}
+#back-to-top:hover{background:var(--rose);transform:translateY(-2px);}
+
+/* No-table notice in cart */
+#no-table-notice{background:var(--blush);border:1px solid var(--rose);border-radius:var(--radius-sm);padding:14px 18px;margin-bottom:16px;text-align:center;display:none;}
+#no-table-notice p{font-size:.84rem;color:var(--rose-deep);margin-bottom:10px;}
+#no-table-notice button{background:var(--rose-deep);color:#fff;border:none;padding:8px 20px;border-radius:99px;cursor:pointer;font-size:.82rem;font-weight:600;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  #site-nav{padding:0 18px;}
+  .nav-links{display:none;}
+  .site-section{padding:65px 22px;}
+  #section-hero{padding:55px 22px 45px;flex-direction:column;min-height:auto;}
+  .hero-visual{display:none;}
+  #section-story{flex-direction:column;padding:65px 22px;}
+  .story-visual{flex:0 0 auto;width:100%;grid-template-rows:150px 150px;}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:28px;}
+}
+@media(max-width:600px){
+  .table-grid{grid-template-columns:repeat(4,1fr);}
+  .footer-inner{grid-template-columns:1fr;}
+  .footer-bottom{flex-direction:column;gap:10px;text-align:center;}
+  #cart-sidebar{width:100%;}
+  .reservation-box{padding:26px 18px;}
+  .hero-stats{gap:22px;}
+}
+</style>
+</head>
+<body>
+
+<!-- MAIN SITE (shown immediately) -->
+<div id="main-site">
+
+  <nav id="site-nav">
+    <a class="nav-logo" href="#section-hero">Pét<span>a</span>le</a>
+    <ul class="nav-links">
+      <li><a href="#section-story">Our Story</a></li>
+      <li><a href="#section-menu">Menu</a></li>
+      <li><a href="#section-table">Tables</a></li>
+      <li><a href="#section-experience">Experience</a></li>
+      <li><a href="#section-chefs">Chefs</a></li>
+      <li><a href="#section-testimonials">Reviews</a></li>
+      <li><a href="#section-reservation">Reserve</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button id="nav-table-btn" onclick="openTableModal()">🌸 Select Table</button>
+      <button id="theme-toggle" title="Toggle theme">🌙</button>
+      <button id="view-bill-btn">📋 Bill</button>
+      <button id="nav-cart-btn">🛒 Cart <span id="nav-cart-count">0</span></button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section id="section-hero">
+    <div class="hero-bg-decor"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Fine Dining · Est. 2018</div>
+      <h1 class="hero-title">Where Every Meal<br><em>Tells a Story</em></h1>
+      <p class="hero-subtitle">Crafted with passion, plated with artistry — Pétale brings the finest ingredients and culinary elegance to your table.</p>
+      <div class="hero-ctas">
+        <a href="#section-menu" class="btn-primary">✨ Explore Menu</a>
+        <button class="btn-outline" onclick="openTableModal()">🌹 Select Your Table</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hero-stat-num">120+</div><div class="hero-stat-label">Menu Items</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">4.9★</div><div class="hero-stat-label">Avg Rating</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">8 Yrs</div><div class="hero-stat-label">Of Excellence</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-img-wrap">🍽️
+        <div class="hero-float-tag tag1"><span>⭐</span> Chef's Special Today</div>
+        <div class="hero-float-tag tag2"><span>🌿</span> Fresh Ingredients</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR STORY -->
+  <section id="section-story" class="site-section">
+    <div class="story-visual">
+      <div class="story-img-block tall">🍷</div>
+      <div class="story-img-block">🌸</div>
+      <div class="story-img-block">🍃</div>
+    </div>
+    <div class="story-content">
+      <div class="section-header">
+        <div class="section-label">Our Story</div>
+        <h2 class="section-title">Born from a love<br>of good food</h2>
+      </div>
+      <blockquote class="story-quote">"Every dish begins with a vision — of flavour, warmth, and the joy of sharing something beautiful with someone you love."</blockquote>
+      <p class="story-body">Pétale was founded in 2018 by a group of passionate chefs who believed that dining should be an experience — not just a meal. From our open kitchen to our hand-curated seasonal menus, every detail is crafted for the people who matter most: you.</p>
+      <div class="story-features">
+        <div class="story-feature"><span class="story-feature-icon">🌱</span><div class="story-feature-text"><h4>Farm-to-Table Sourcing</h4><p>Seasonal produce from local farms we trust and visit</p></div></div>
+        <div class="story-feature"><span class="story-feature-icon">👩‍🍳</span><div class="story-feature-text"><h4>World-Class Chefs</h4><p>Passionate culinary artists with international training</p></div></div>
+        <div class="story-feature"><span class="story-feature-icon">🕯️</span><div class="story-feature-text"><h4>Intimate Ambiance</h4><p>Thoughtfully designed spaces for every occasion</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section id="section-menu" class="site-section">
+    <div class="section-header centered">
+      <div class="section-label">The Menu</div>
+      <h2 class="section-title">Crafted for Every Craving</h2>
+      <p class="section-subtitle">Explore our finest selections, crafted to perfection by world-class chefs using the freshest seasonal ingredients.</p>
+    </div>
+    <div class="menu-tabs-wrap" id="cat-tabs"></div>
+    <div id="menu-grid"><div id="loading"><div class="spinner"></div><p style="color:var(--text-muted);font-family:'Cormorant Garamond',serif;font-style:italic;">Preparing the menu…</p></div></div>
+  </section>
+
+  <!-- TABLE SECTION -->
+  <section id="section-table" class="site-section">
+    <div class="section-header centered">
+      <div class="section-label">Seating</div>
+      <h2 class="section-title">Choose Your Table</h2>
+      <p class="section-subtitle">Switch tables or check availability across our dining room.</p>
+    </div>
+    <div class="table-grid-section" id="section-table-grid"></div>
+    <p style="color:var(--text-muted);font-size:.83rem;font-style:italic;font-family:'Cormorant Garamond',serif;">🌸 Available &nbsp;&nbsp;✦ Occupied &nbsp;&nbsp;🌹 Your Table</p>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="section-experience" class="site-section">
+    <div class="section-header centered">
+      <div class="section-label">Why Pétale</div>
+      <h2 class="section-title">Serving You Better</h2>
+      <p class="section-subtitle">More than great food — an experience designed around you from start to finish.</p>
+    </div>
+    <div class="experience-grid">
+      <div class="exp-card"><span class="exp-icon">📱</span><h3>Seamless Table Ordering</h3><p>Browse and order directly from your table — no waiting, no confusion.</p></div>
+      <div class="exp-card"><span class="exp-icon">🌿</span><h3>Fresh Daily Menu</h3><p>Our menu evolves with the seasons, ensuring the freshest ingredients every visit.</p></div>
+      <div class="exp-card"><span class="exp-icon">👩‍🍳</span><h3>World-Class Chefs</h3><p>Each dish is crafted by chefs trained across three continents, bringing global flavours locally.</p></div>
+      <div class="exp-card"><span class="exp-icon">✨</span><h3>Spotless Kitchen</h3><p>Our kitchen holds a 5-star hygiene rating. We invite any guest to see where the magic happens.</p></div>
+      <div class="exp-card"><span class="exp-icon">🕐</span><h3>Table Availability</h3><p>Real-time table tracking means you always know what's free when your perfect spot is ready.</p></div>
+      <div class="exp-card"><span class="exp-icon">💳</span><h3>Flexible Payments</h3><p>Cash or card, split or single — your bill, your way. Settled in seconds, right at your table.</p></div>
+    </div>
+  </section>
+
+  <!-- CHEFS -->
+  <section id="section-chefs" class="site-section">
+    <div class="section-header centered">
+      <div class="section-label">Meet the Team</div>
+      <h2 class="section-title">Crafted by Experts</h2>
+      <p class="section-subtitle">Each dish begins with vision, skill, and passion. Meet the culinary artists behind every plate.</p>
+    </div>
+    <div class="chefs-grid">
+      <div class="chef-card"><div class="chef-avatar">👨‍🍳</div><h3>James Carlow</h3><p>Executive Chef · 18 yrs</p><span class="chef-specialty">French Cuisine</span></div>
+      <div class="chef-card"><div class="chef-avatar">👩‍🍳</div><h3>Elena Morin</h3><p>Head Pastry Chef · 12 yrs</p><span class="chef-specialty">Patisserie & Desserts</span></div>
+      <div class="chef-card"><div class="chef-avatar">👨‍🍳</div><h3>Takeshi Ito</h3><p>Sous Chef · 10 yrs</p><span class="chef-specialty">Asian Fusion</span></div>
+      <div class="chef-card"><div class="chef-avatar">👩‍🍳</div><h3>Sofia Reyes</h3><p>Chef de Partie · 8 yrs</p><span class="chef-specialty">Mediterranean</span></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="section-testimonials" class="site-section">
+    <div class="section-header centered">
+      <div class="section-label">Reviews</div>
+      <h2 class="section-title">Praise from Our Patrons</h2>
+      <p class="section-subtitle">Real voices. Honest praise. Unforgettable moments shared at our table.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card"><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">Every bite was a masterpiece. You can taste the passion and precision in every dish. Absolutely worth it.</p><div class="testimonial-author"><div class="author-avatar">😊</div><div><div class="author-name">Sophia M.</div><div class="author-role">Food Critic</div></div></div></div>
+      <div class="testimonial-card"><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">Exceptional service and flavours that transport you. We celebrated our anniversary here and it couldn't have been more perfect.</p><div class="testimonial-author"><div class="author-avatar">🌸</div><div><div class="author-name">Ava R.</div><div class="author-role">Lifestyle Blogger</div></div></div></div>
+      <div class="testimonial-card"><div class="testimonial-stars">★★★★★</div><p class="testimonial-text">The table ordering system is brilliant — so seamless. The truffle pasta alone is reason enough to keep coming back.</p><div class="testimonial-author"><div class="author-avatar">👨‍💼</div><div><div class="author-name">Daniel L.</div><div class="author-role">Culinary Enthusiast</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- RESERVATION -->
+  <section id="section-reservation" class="site-section">
+    <div class="reservation-box">
+      <div class="section-label">Reservations</div>
+      <h2 class="section-title">Luxury dining<br>starts here</h2>
+      <p class="section-subtitle">Whether it's an intimate dinner or a grand celebration, we're here to make it special.</p>
+      <div class="res-info">
+        <div class="res-info-item"><span class="res-info-icon">📞</span><div class="res-info-text"><h4>Call Us</h4><p>+92 21 3456 7890 · Available 11am – 11pm</p></div></div>
+        <div class="res-info-item"><span class="res-info-icon">📍</span><div class="res-info-text"><h4>Find Us</h4><p>12 Bloom Street, Clifton, Karachi</p></div></div>
+        <div class="res-info-item"><span class="res-info-icon">🕐</span><div class="res-info-text"><h4>Hours</h4><p>Mon – Sun · Noon to 11:30 PM</p></div></div>
+        <div class="res-info-item"><span class="res-info-icon">🎂</span><div class="res-info-text"><h4>Special Events</h4><p>Birthdays, anniversaries, corporate dinners</p></div></div>
+      </div>
+      <button class="btn-primary res-cta" onclick="document.getElementById('section-menu').scrollIntoView({behavior:'smooth'})">🌹 Start Ordering Now</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">Pét<span>a</span>le</div>
+        <p>Where every meal tells a story. Crafted with passion, served with love — Pétale has been Karachi's finest dining destination since 2018.</p>
+      </div>
+      <div class="footer-col"><h4>Navigate</h4><ul><li><a href="#section-hero">Home</a></li><li><a href="#section-story">Our Story</a></li><li><a href="#section-menu">Menu</a></li><li><a href="#section-chefs">Our Chefs</a></li></ul></div>
+      <div class="footer-col"><h4>Dining</h4><ul><li><a href="#section-table">Table Selection</a></li><li><a href="#section-reservation">Reservations</a></li><li><a href="#section-experience">Experience</a></li><li><a href="#section-testimonials">Reviews</a></li></ul></div>
+      <div class="footer-col"><h4>Connect</h4><ul><li><a href="#">Instagram</a></li><li><a href="#">Facebook</a></li><li><a href="#">TikTok</a></li><li><a href="#">hello@petale.pk</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Pétale Fine Dining. Made with 🌹 in Karachi.</p>
+      <nav class="footer-nav"><a href="#section-hero">Privacy</a><a href="#section-hero">Terms</a></nav>
+    </div>
+  </footer>
+
+</div>
+
+<!-- TABLE SELECT MODAL -->
+<div id="table-modal-overlay">
+  <div id="table-modal">
+    <button id="modal-close-btn" onclick="closeTableModal()">✕</button>
+    <div class="tss-petal">🌸</div>
+    <h2>Choose Your Table</h2>
+    <p>Select a table to begin ordering</p>
+    <div class="table-grid" id="table-grid"></div>
+    <p style="color:var(--text-muted);font-size:.78rem;font-style:italic;font-family:'Cormorant Garamond',serif;">🌸 Available &nbsp; 🚫 Occupied &nbsp; 🌹 Your Table</p>
+  </div>
+</div>
+
+<!-- Cart Overlay & Sidebar -->
+<div id="cart-overlay"></div>
+<div id="cart-sidebar">
+  <div id="cart-header"><h2>🛒 Your Order</h2><button id="close-cart">✕</button></div>
+  <div id="cart-items"></div>
+  <div id="cart-footer">
+    <div id="no-table-notice">
+      <p>Please select a table before placing an order.</p>
+      <button onclick="closeCart();openTableModal()">🌸 Select Table</button>
+    </div>
+    <div id="cart-total"><span>Total</span><span id="total-amount">Rs. 0</span></div>
+    <button id="place-order-btn">✨ Place Order</button>
+  </div>
+</div>
+
+<!-- Order Success -->
+<div id="order-success">
+  <div class="success-box">
+    <div class="icon">🌸</div>
+    <h2>Order Placed!</h2>
+    <p>Your order has been sent to our kitchen. We'll have it ready for you shortly.</p>
+    <button onclick="closeSuccess()">Continue Ordering</button>
+  </div>
+</div>
+
+<!-- Bill Modal -->
+<div id="bill-modal">
+  <div class="bill-box">
+    <h2>🧾 Your Bill</h2>
+    <div id="bill-items"></div>
+    <div class="bill-total bill-row"><span>Total</span><span id="bill-total-amt"></span></div>
+    <div class="pay-btns">
+      <button class="pay-btn pay-cash" onclick="payBill('cash')">💵 Cash</button>
+      <button class="pay-btn pay-card" onclick="payBill('card')">💳 Card</button>
+    </div>
+    <button class="bill-close" onclick="closeBill()">Close</button>
+  </div>
+</div>
+
+<!-- Back to Top -->
+<button id="back-to-top" title="Back to top">↑</button>
+
+<script>
+/* THEME */
+const themeToggle=document.getElementById('theme-toggle');
+const html=document.documentElement;
+let isDark=false;
+themeToggle.onclick=()=>{isDark=!isDark;html.setAttribute('data-theme',isDark?'dark':'light');themeToggle.textContent=isDark?'☀️':'🌙';};
+
+/* BACK TO TOP */
+const btt=document.getElementById('back-to-top');
+window.addEventListener('scroll',()=>{btt.classList.toggle('visible',window.scrollY>400);});
+btt.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+/* APP STATE */
+const API='http://localhost:3001/api';
+let tableId=null,tableNumber=null,categories=[],menuItems=[],cart={},activeOrderId=null,allTables=[];
+
+/* TABLE MODAL */
+function openTableModal(){
+  renderTableModal();
+  document.getElementById('table-modal-overlay').classList.add('open');
+}
+function closeTableModal(){
+  document.getElementById('table-modal-overlay').classList.remove('open');
+}
+document.getElementById('table-modal-overlay').addEventListener('click',e=>{
+  if(e.target===document.getElementById('table-modal-overlay'))closeTableModal();
+});
+
+function renderTableModal(){
+  const grid=document.getElementById('table-grid');
+  grid.innerHTML='';
+  allTables.forEach(t=>{
+    const isCurrent=t.id===tableId;
+    const isOccupied=t.status==='occupied'&&!isCurrent;
+    const btn=document.createElement('button');
+    btn.className='table-btn'+(isOccupied?' occupied':'')+(isCurrent?' current':'');
+    btn.textContent=t.table_number;
+    btn.title=isOccupied?'Table occupied':`Table ${t.table_number}`;
+    if(!isOccupied)btn.onclick=()=>{selectTable(t);closeTableModal();};
+    grid.appendChild(btn);
+  });
+}
+
+function updateNavTableBtn(){
+  const btn=document.getElementById('nav-table-btn');
+  if(tableNumber){
+    btn.textContent=`🌹 Table ${tableNumber}`;
+    btn.classList.add('has-table');
+  } else {
+    btn.textContent='🌸 Select Table';
+    btn.classList.remove('has-table');
+  }
+}
+
+async function init(){
+  const tablesRes=await fetch(`${API}/tables`);
+  allTables=await tablesRes.json();
+  const urlParams=new URLSearchParams(window.location.search);
+  const tableParam=urlParams.get('table');
+  if(tableParam){const found=allTables.find(t=>t.table_number==tableParam);if(found){selectTable(found);return;}}
+  loadMenu();
+  buildSectionTableGrid();
+}
+
+function selectTable(t){
+  tableId=t.id;tableNumber=t.table_number;
+  updateNavTableBtn();
+  document.getElementById('view-bill-btn').style.display='inline-flex';
+  history.replaceState(null,'',`?table=${tableNumber}`);
+  checkExistingOrder();
+  buildSectionTableGrid();
+  renderTableModal();
+  updateNoTableNotice();
+}
+
+function buildSectionTableGrid(){
+  const grid=document.getElementById('section-table-grid');grid.innerHTML='';
+  allTables.forEach(t=>{
+    const isCurrent=t.id===tableId;
+    const isOccupied=t.status==='occupied'&&!isCurrent;
+    const btn=document.createElement('button');
+    btn.className='table-btn-section'+(isOccupied?' occupied':'')+(isCurrent?' current':'');
+    btn.textContent=t.table_number;
+    if(!isOccupied&&!isCurrent)btn.onclick=()=>{selectTable(t);document.getElementById('section-menu').scrollIntoView({behavior:'smooth'});};
+    grid.appendChild(btn);
+  });
+}
+
+async function loadMenu(){
+  const [catsRes,menuRes]=await Promise.all([fetch(`${API}/categories`),fetch(`${API}/menu`)]);
+  categories=await catsRes.json();menuItems=await menuRes.json();
+  renderCatTabs();renderMenu('all');
+}
+
+function renderCatTabs(){
+  const tabs=document.getElementById('cat-tabs');tabs.innerHTML='';
+  const allTab=document.createElement('button');allTab.className='cat-tab active';allTab.textContent='🍽️ All';allTab.onclick=()=>filterMenu('all',allTab);tabs.appendChild(allTab);
+  categories.forEach(cat=>{const tab=document.createElement('button');tab.className='cat-tab';tab.textContent=cat.name;tab.onclick=()=>filterMenu(cat.id,tab);tabs.appendChild(tab);});
+}
+
+function filterMenu(catId,el){document.querySelectorAll('.cat-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderMenu(catId);}
+
+function getItemEmoji(name){
+  const n=name.toLowerCase();
+  if(n.includes('chicken'))return'🍗';if(n.includes('burger'))return'🍔';if(n.includes('pizza'))return'🍕';
+  if(n.includes('pasta'))return'🍝';if(n.includes('rice')||n.includes('biryani'))return'🍛';
+  if(n.includes('cake')||n.includes('dessert'))return'🍰';if(n.includes('ice cream'))return'🍦';
+  if(n.includes('fries'))return'🍟';if(n.includes('cola')||n.includes('drink')||n.includes('juice')||n.includes('shake')||n.includes('tea'))return'🥤';
+  if(n.includes('soup'))return'🍲';if(n.includes('salad'))return'🥗';if(n.includes('bread'))return'🍞';
+  if(n.includes('roll'))return'🌯';if(n.includes('nugget'))return'🍿';if(n.includes('wing'))return'🍖';
+  return'🍴';
+}
+
+function renderMenuImage(item){
+  if(item.image_url&&item.image_url.trim()){
+    return`<img src="${item.image_url}" alt="${item.name}" onerror="this.style.display='none';this.nextSibling.style.display='flex'"><span class="img-emoji" style="display:none">${getItemEmoji(item.name)}</span>`;
+  }
+  return`<span>${getItemEmoji(item.name)}</span>`;
+}
+
+function renderMenu(catId){
+  const grid=document.getElementById('menu-grid');
+  const filtered=catId==='all'?menuItems:menuItems.filter(i=>i.category_id==catId);
+  if(filtered.length===0){grid.innerHTML='<p style="padding:40px;color:var(--text-muted);font-family:\'Cormorant Garamond\',serif;font-style:italic;">No items in this category.</p>';return;}
+  grid.innerHTML=filtered.map(item=>`
+    <div class="menu-card">
+      <div class="menu-card-img">${renderMenuImage(item)}</div>
+      <div class="menu-card-body">
+        <h3>${item.name}</h3>
+        <p>${item.description||''}</p>
+        <div class="menu-card-footer">
+          <div>
+            <span class="price">Rs. ${item.price}</span>
+            ${item.offer?`<span class="offer-tag">${item.offer}</span>`:''}
+            <br><span class="spicy-tag spicy-${item.spicy_level}">🌶 ${item.spicy_level}</span>
+          </div>
+          <div id="ctrl-${item.id}"><button class="add-btn" onclick="addToCart(${item.id})">+ Add</button></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  Object.keys(cart).forEach(id=>updateCtrl(parseInt(id)));
+}
+
+function addToCart(id){cart[id]=(cart[id]||0)+1;updateCtrl(id);updateCartCount();}
+function removeFromCart(id){if(!cart[id])return;cart[id]--;if(cart[id]===0)delete cart[id];updateCtrl(id);updateCartCount();}
+
+function updateCtrl(id){
+  const el=document.getElementById(`ctrl-${id}`);if(!el)return;
+  const qty=cart[id]||0;
+  el.innerHTML=qty===0
+    ?`<button class="add-btn" onclick="addToCart(${id})">+ Add</button>`
+    :`<div class="qty-control"><button onclick="removeFromCart(${id})">−</button><span>${qty}</span><button onclick="addToCart(${id})">+</button></div>`;
+}
+
+function updateCartCount(){document.getElementById('nav-cart-count').textContent=Object.values(cart).reduce((a,b)=>a+b,0);}
+
+function updateNoTableNotice(){
+  const notice=document.getElementById('no-table-notice');
+  if(!tableId){notice.style.display='block';}else{notice.style.display='none';}
+}
+
+document.getElementById('nav-cart-btn').onclick=openCart;
+document.getElementById('cart-overlay').onclick=closeCart;
+document.getElementById('close-cart').onclick=closeCart;
+
+function openCart(){renderCartItems();updateNoTableNotice();document.getElementById('cart-overlay').classList.add('open');document.getElementById('cart-sidebar').classList.add('open');}
+function closeCart(){document.getElementById('cart-overlay').classList.remove('open');document.getElementById('cart-sidebar').classList.remove('open');}
+
+function renderCartItems(){
+  const container=document.getElementById('cart-items');const ids=Object.keys(cart);
+  if(ids.length===0){container.innerHTML='<div id="empty-cart"><div style="font-size:3rem">🌸</div><p>Your cart is empty</p></div>';document.getElementById('total-amount').textContent='Rs. 0';return;}
+  let total=0;
+  container.innerHTML=ids.map(id=>{
+    const item=menuItems.find(m=>m.id==id);if(!item)return'';
+    const subtotal=item.price*cart[id];total+=subtotal;
+    const thumbHtml=item.image_url&&item.image_url.trim()
+      ?`<div class="cart-item-emoji" style="width:40px;height:40px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1px solid var(--border)"><img src="${item.image_url}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='<span style=font-size:1.9rem>${getItemEmoji(item.name)}</span>'"></div>`
+      :`<div class="cart-item-emoji">${getItemEmoji(item.name)}</div>`;
+    return`<div class="cart-item">${thumbHtml}<div class="cart-item-info"><h4>${item.name}</h4><p>Rs. ${item.price} × ${cart[id]} = Rs. ${subtotal}</p></div><div class="qty-control"><button onclick="removeFromCart(${id});renderCartItems()">−</button><span>${cart[id]}</span><button onclick="addToCart(${id});renderCartItems()">+</button></div></div>`;
+  }).join('');
+  document.getElementById('total-amount').textContent=`Rs. ${total.toFixed(0)}`;
+}
+
+document.getElementById('place-order-btn').onclick=placeOrder;
+
+async function placeOrder(){
+  if(!tableId){openTableModal();return;}
+  const ids=Object.keys(cart);if(ids.length===0){alert('Your cart is empty!');return;}
+  const items=ids.map(id=>({menu_item_id:parseInt(id),quantity:cart[id]}));
+  const res=await fetch(`${API}/orders`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({table_id:tableId,items})});
+  const data=await res.json();
+  if(data.order_id){
+    activeOrderId=data.order_id;cart={};updateCartCount();closeCart();
+    document.querySelectorAll('[id^=ctrl-]').forEach(el=>{const id=el.id.replace('ctrl-','');el.innerHTML=`<button class="add-btn" onclick="addToCart(${id})">+ Add</button>`;});
+    document.getElementById('order-success').classList.add('show');
+  }
+}
+
+function closeSuccess(){document.getElementById('order-success').classList.remove('show');}
+
+async function checkExistingOrder(){const res=await fetch(`${API}/orders/table/${tableId}`);const order=await res.json();if(order)activeOrderId=order.id;}
+
+document.getElementById('view-bill-btn').onclick=openBill;
+
+async function openBill(){
+  if(!activeOrderId){alert('No active order found for this table.');return;}
+  const res=await fetch(`${API}/orders/${activeOrderId}`);const order=await res.json();
+  document.getElementById('bill-items').innerHTML=order.items.map(i=>`<div class="bill-row"><span>${i.item_name} x${i.quantity}</span><span>Rs. ${(i.unit_price*i.quantity).toFixed(0)}</span></div>`).join('');
+  document.getElementById('bill-total-amt').textContent=`Rs. ${order.total_amount.toFixed(0)}`;
+  document.getElementById('bill-modal').classList.add('show');
+}
+
+function closeBill(){document.getElementById('bill-modal').classList.remove('show');}
+
+async function payBill(method){
+  if(!activeOrderId)return;
+  await fetch(`${API}/orders/${activeOrderId}/pay`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({payment_method:method})});
+  closeBill();alert(`🌹 Payment by ${method} confirmed! Thank you for dining with us at Pétale!`);activeOrderId=null;
+}
+
+init();
+</script>
+</body>
+</html>

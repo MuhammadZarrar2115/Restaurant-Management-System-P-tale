@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pétale — Kitchen Display</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:#e8a4b4;--rose-deep:#c97d93;--blush:#f9eef2;--petal:#fdf4f7;
+  --gold:#c9a96e;--gold-light:#f0e0c0;--sage:#8aad9a;
+  --bg:#fdf6f9;--bg2:#fff9fb;--card:#ffffff;--border:#f0dde5;
+  --text:#2a1f25;--text-mid:#6b4f5a;--text-muted:#a08090;
+  --shadow:0 4px 24px rgba(180,100,130,0.10);
+  --shadow-lg:0 8px 40px rgba(180,100,130,0.15);
+  --radius:16px;--radius-sm:10px;
+  --pending-bg:#fde8e8;--pending:#c0392b;
+  --preparing-bg:#fef3e2;--preparing:#b7730a;
+  --ready-bg:#e8f4ee;--ready:#3a7a54;
+}
+[data-theme="dark"]{
+  --bg:#1a1018;--bg2:#231520;--card:#2d1e27;--border:#4a2d3a;
+  --text:#fceef4;--text-mid:#d4a8bb;--text-muted:#9a7080;
+  --rose:#d47d97;--rose-deep:#b85c77;--blush:#2d1e27;--petal:#231520;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);--shadow-lg:0 8px 40px rgba(0,0,0,0.5);
+  --pending-bg:#3a1010;--preparing-bg:#2a200a;--ready-bg:#0f2a18;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-thumb{background:var(--rose);border-radius:99px;}
+
+/* HEADER */
+header{background:var(--card);border-bottom:2px solid var(--border);padding:0 32px;height:70px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);}
+.header-brand{display:flex;align-items:center;gap:14px;}
+.header-logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-style:italic;color:var(--rose-deep);letter-spacing:.02em;}
+.header-logo span{color:var(--gold);}
+.header-subtitle{font-size:.76rem;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;border-left:1px solid var(--border);padding-left:14px;}
+.header-right{display:flex;align-items:center;gap:14px;}
+#time{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text-mid);}
+#theme-btn{background:var(--blush);border:1px solid var(--border);color:var(--text-muted);width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+#theme-btn:hover{background:var(--rose-deep);color:#fff;border-color:var(--rose-deep);}
+.live-badge{background:var(--ready-bg);color:var(--ready);font-size:.72rem;font-weight:700;padding:5px 12px;border-radius:99px;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+.live-dot{width:7px;height:7px;background:var(--ready);border-radius:50%;animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(.8);}}
+
+/* ORDER COUNT BAR */
+#status-bar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 32px;display:flex;gap:20px;align-items:center;}
+.status-pill{font-size:.78rem;font-weight:600;padding:5px 14px;border-radius:99px;display:flex;align-items:center;gap:6px;}
+.pill-pending{background:var(--pending-bg);color:var(--pending);}
+.pill-preparing{background:var(--preparing-bg);color:var(--preparing);}
+.status-bar-sep{width:1px;height:20px;background:var(--border);}
+
+/* ORDERS GRID */
+#orders-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:20px;padding:24px 32px;}
+
+/* ORDER CARD */
+.order-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow .2s;}
+.order-card:hover{box-shadow:var(--shadow-lg);}
+.order-card.pending{border-top:4px solid var(--pending);}
+.order-card.preparing{border-top:4px solid var(--preparing);}
+
+.order-head{padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border-bottom:1px solid var(--border);}
+.order-table{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text);}
+.status-badge{padding:4px 12px;border-radius:99px;font-size:.7rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.badge-pending{background:var(--pending-bg);color:var(--pending);}
+.badge-preparing{background:var(--preparing-bg);color:var(--preparing);}
+
+.order-meta{padding:8px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.order-time{font-size:.75rem;color:var(--text-muted);}
+.order-timer{font-size:.72rem;font-weight:600;padding:2px 9px;border-radius:99px;}
+.timer-fresh{background:var(--ready-bg);color:var(--ready);}
+.timer-warn{background:var(--preparing-bg);color:var(--preparing);}
+.timer-urgent{background:var(--pending-bg);color:var(--pending);}
+
+.order-items{padding:10px 18px;}
+.order-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
+.order-item:last-child{border-bottom:none;}
+.item-name{font-size:.88rem;color:var(--text);}
+.qty-badge{background:var(--blush);color:var(--rose-deep);padding:3px 10px;border-radius:99px;font-size:.78rem;font-weight:700;}
+
+.action-btns{padding:14px 18px;display:flex;gap:10px;}
+.action-btn{flex:1;padding:11px;border:none;border-radius:99px;cursor:pointer;font-weight:700;font-size:.84rem;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.02em;}
+.btn-prepare{background:var(--preparing-bg);color:var(--preparing);border:1.5px solid #f0c060;}
+.btn-prepare:hover{background:var(--preparing);color:#fff;border-color:var(--preparing);}
+.btn-ready{background:var(--ready-bg);color:var(--ready);border:1.5px solid #a0d4a8;}
+.btn-ready:hover{background:var(--ready);color:#fff;border-color:var(--ready);}
+
+/* EMPTY STATE */
+#empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:16px;color:var(--text-muted);padding:40px;}
+.empty-icon{font-size:4rem;animation:floatPetal 3s ease-in-out infinite;}
+@keyframes floatPetal{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-12px) rotate(5deg);}}
+.empty-title{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--text);}
+.empty-sub{font-size:.88rem;color:var(--text-muted);}
+
+/* REFRESH INFO */
+#refresh-info{text-align:center;color:var(--text-muted);padding:12px 24px 24px;font-size:.78rem;font-style:italic;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">
+    <div class="header-logo">Pét<span>a</span>le</div>
+    <div class="header-subtitle">👨‍🍳 Kitchen Display</div>
+  </div>
+  <div class="header-right">
+    <div class="live-badge"><span class="live-dot"></span> Live</div>
+    <div id="time"></div>
+    <button id="theme-btn" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<div id="status-bar">
+  <span class="status-pill pill-pending">🔴 Pending: <strong id="count-pending">0</strong></span>
+  <div class="status-bar-sep"></div>
+  <span class="status-pill pill-preparing">🟡 Preparing: <strong id="count-preparing">0</strong></span>
+</div>
+
+<div id="orders-grid"></div>
+<div id="refresh-info">Auto-refreshes every 15 seconds</div>
+
+<script>
+const API='http://localhost:3001/api';
+let isDark=false;
+
+function toggleTheme(){
+  isDark=!isDark;
+  document.documentElement.setAttribute('data-theme',isDark?'dark':'light');
+  document.getElementById('theme-btn').textContent=isDark?'☀️':'🌙';
+}
+
+function updateTime(){document.getElementById('time').textContent=new Date().toLocaleTimeString();}
+setInterval(updateTime,1000);updateTime();
+
+function timeSince(dateStr){
+  const diff=Math.floor((new Date()-new Date(dateStr))/1000);
+  if(diff<60)return`${diff}s ago`;
+  if(diff<3600)return`${Math.floor(diff/60)}m ago`;
+  return`${Math.floor(diff/3600)}h ago`;
+}
+
+function timerClass(dateStr){
+  const mins=Math.floor((new Date()-new Date(dateStr))/60000);
+  if(mins<5)return'timer-fresh';
+  if(mins<12)return'timer-warn';
+  return'timer-urgent';
+}
+
+function timerLabel(dateStr){
+  const mins=Math.floor((new Date()-new Date(dateStr))/60000);
+  if(mins<5)return'⏱ Fresh';
+  if(mins<12)return`⏱ ${mins}m`;
+  return`🔥 ${mins}m — Urgent`;
+}
+
+async function loadOrders(){
+  const res=await fetch(`${API}/orders/kitchen`);
+  const orders=await res.json();
+  const grid=document.getElementById('orders-grid');
+  const pending=orders.filter(o=>o.status==='pending').length;
+  const preparing=orders.filter(o=>o.status==='preparing').length;
+  document.getElementById('count-pending').textContent=pending;
+  document.getElementById('count-preparing').textContent=preparing;
+  if(orders.length===0){
+    grid.innerHTML=`
+      <div id="empty-state" style="grid-column:1/-1">
+        <div class="empty-icon">🌸</div>
+        <div class="empty-title">All caught up!</div>
+        <div class="empty-sub">No pending orders right now.</div>
+      </div>`;
+    return;
+  }
+  grid.innerHTML=orders.map(o=>`
+    <div class="order-card ${o.status}" id="card-${o.id}">
+      <div class="order-head">
+        <span class="order-table">🪑 Table ${o.table_number}</span>
+        <span class="status-badge badge-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-meta">
+        <span class="order-time">${timeSince(o.created_at)}</span>
+        <span class="order-timer ${timerClass(o.created_at)}">${timerLabel(o.created_at)}</span>
+      </div>
+      <div class="order-items">
+        ${o.items.map(i=>`
+          <div class="order-item">
+            <span class="item-name">${i.item_name}</span>
+            <span class="qty-badge">×${i.quantity}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="action-btns">
+        ${o.status==='pending'?`<button class="action-btn btn-prepare" onclick="updateStatus('${o.id}','preparing')">🔥 Start Preparing</button>`:''}
+        ${o.status==='preparing'?`<button class="action-btn btn-ready" onclick="updateStatus('${o.id}','ready')">✅ Mark Ready</button>`:''}
+      </div>
+    </div>
+  `).join('');
+}
+
+async function updateStatus(orderId,status){
+  await fetch(`${API}/orders/${orderId}/status`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+  loadOrders();
+}
+
+loadOrders();
+setInterval(loadOrders,15000);
+</script>
+</body>
+</html>
