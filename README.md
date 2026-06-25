@@ -1,4 +1,4 @@
-# 🍽️ Table Top Ordering System
+# 🍽️ Restaurant Management System | Pétale
 
 A full-stack restaurant ordering system built with Node.js, Express, SQLite, and vanilla HTML/CSS/JS.
 
